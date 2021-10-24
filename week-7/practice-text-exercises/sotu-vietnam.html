@@ -27,7 +27,7 @@ var y = d3.scaleLinear()
     .rangeRound([height, 0]);
 
 var z = d3.scaleOrdinal()
-    .range(["#98abc5", "#9c98c5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00", "#76cfc5"]);
+    .range(["#98abc5", "#9c98c5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
 
 d3.csv("https://raw.githubusercontent.com/m0llyc00k/dvia/master/sotu-vietnam-data-simple-2.csv", function(d, i, columns) {
   for (i = 1, t = 0; i < columns.length; ++i) t += d[columns[i]] = +d[columns[i]];

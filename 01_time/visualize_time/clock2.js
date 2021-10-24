@@ -37,8 +37,17 @@ function draw() {
   ellipse(400 + sin(xpos) * second()*3, 380, 60, 60);
   ellipse(400 + sin(xpos) * second()*2, 370, 60, 60);
   fill(255, 0, 100,100);
-  xpos += 0.01;
- }
+  
+//   for(let i = 0; i < xpos; i++){
+// 	ellipse(400 + sin(i) * second() * 2, 540, 60, 60);
+// 	ellipse(400 + sin(i) * second() * 6, i + 10 , 60, 60);
+	 xpos += 0.01;
+}
+}
+ 
+
+
+
 
 //   function secondWorm () {
 //   ellipse(200 + sin(xpos) * second()*2, 550, 75, 75);
