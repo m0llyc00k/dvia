@@ -7,11 +7,11 @@
 
   <!-- https://d3js.org/ -->
   <script src='https://d3js.org/d3.v7.min.js'></script>
-
-
-  <script src='https://api.mapbox.com/mapbox-gl-js/v2.4.1/mapbox-gl.js'></script>
-  <link href='https://api.mapbox.com/mapbox-gl-js/v2.4.1/mapbox-gl.css' rel='stylesheet' />
-
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v2.5.1/mapbox-gl.js"></script>
+<link
+href="https://api.tiles.mapbox.com/mapbox-gl-js/v2.5.1/mapbox-gl.css"
+rel="stylesheet"
+/>
   <style>
     body {
       padding: 0;
@@ -28,7 +28,7 @@
     .markerAll {
       width: 3px;
       height: 3px;
-      background-color: red;
+      background-color: navy;
       border-radius: 50%;
       cursor: pointer;
     }
@@ -74,6 +74,7 @@
 <body>
   <!-- target for Mapbox canvas -->
   <div id='map'></div>
+<div id="legend1" style="display: inline-block"></div>
   <!-- JavaScript, often loaded as separate script.js file -->
   <script src="script.js"></script>
 </body>
