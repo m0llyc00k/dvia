@@ -168,11 +168,6 @@ function handleMouseOver(event, i) { // Add interactivity
   }).join('')}
 `
 
-
-  d3.selectAll("rect").style("opacity", 0.5)
-  d3.select(this)
-    .style("opacity", 1)
-
   d3.selectAll("path").style("opacity", 0.5)
   d3.select(this)
     .style("opacity", 1)

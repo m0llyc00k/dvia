@@ -4,6 +4,10 @@
 //https://www.d3-graph-gallery.com/graph/choropleth_basic.html
 //http://using-d3js.com/04_05_sequential_scales.html
 //http://bl.ocks.org/syntagmatic/e8ccca52559796be775553b467593a9f
+//https://docs.mapbox.com/help/tutorials/markers-js/
+// https://github.com/d3/d3-3.x-api-reference/blob/master/Geo-Paths.md
+//https://docs.mapbox.com/help/tutorials/choropleth-studio-gl-pt-2/
+//https://docs.mapbox.com/mapbox-gl-js/example/custom-marker-icons/
 
 let objects
 
@@ -28,21 +32,27 @@ d3.json('https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_110m_admin_
 
     /*** load data all earthquakes ***/
     async function loadData() {
-      const earthquakeAll = await d3.csv('all_month.csv');
-
+      const earthquakeAll = await d3.csv('all_week.csv');
       // add markers to map
       earthquakeAll.forEach(function(d) {
+
+        const width = d.mag * 5;
+        const height = d.mag * 5;
 
         // create a HTML element for each feature
         var all = document.createElement('div');
         all.className = 'markerAll';
+        all.style.width = `${width}px`;
+        all.style.height = `${height}px`;
+
 
         // make a marker for each feature and add to the map
         new mapboxgl.Marker(all)
           .setLngLat([d.longitude, d.latitude])
           .setPopup(new mapboxgl.Popup({ offset: 25 }) // add popups
-            .setHTML('<h2>' + d.place + '</h2>' + '</br>' + '<h3>' + d.time + '</h3>'))
+            .setHTML('<h2>' + 'Place: ' + d.place + '</h2>' + '</br>' + '<h3>' + 'Magnitude: ' + d.mag + '</h3>' + '</br>' + '<h3>' + 'Time: ' + d.time + '</h3>'))
           .addTo(map);
+
       });
     }
 
@@ -60,13 +70,13 @@ d3.json('https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_110m_admin_
       this.stream.point(point.x, point.y)
     }
 
-var myColor = d3.scaleThreshold()
-  .domain([100000, 1000000, 10000000, 30000000, 100000000, 500000000])
-  .range(d3.schemeGreens[7]);
+    var myColor = d3.scaleThreshold()
+      .domain([100000, 1000000, 10000000, 30000000, 100000000, 500000000])
+      .range(d3.schemeGreens[7]);
 
 
     let transform = d3.geoTransform({ point: projectPoint })
-    let path = d3.geoPath().projection(transform) // https://github.com/d3/d3-3.x-api-reference/blob/master/Geo-Paths.md
+    let path = d3.geoPath().projection(transform)
 
     let featureElement = svg
       .selectAll('path')
@@ -78,13 +88,12 @@ var myColor = d3.scaleThreshold()
       .attr("fill", function(d) {
         return myColor(d.properties.pop_est)
       })
-      // .attr('fill', 'lightgray')
       .attr('fill-opacity', 0.5)
       .on('mouseover', function(d) {
         // https://developer.mozilla.org/en-US/docs/Web/API/Event/srcElement
         console.log(d.srcElement.__data__)
         d3.select(this).attr('fill', 'PowderBlue')
-        //we control name
+        //add hover to name
         d3.select('#hover')
           .text(d.srcElement.__data__.properties.name + ' has a population of ' + (d.srcElement.__data__.properties.pop_est / 1000000).toFixed(1) + ' M')
         d3.select('#hover').attr('fill-opacity', 1)
@@ -96,7 +105,7 @@ var myColor = d3.scaleThreshold()
         d3.select('#hover').attr('fill-opacity', 0)
       })
       .on('mousemove', (d) => {
-        // console.log(d3.pointer(d))
+
         d3.select('#hover')
           .attr('x', () => { return d3.pointer(d)[0] + 20 })
           .attr('y', () => { return d3.pointer(d)[1] + 10 })
@@ -111,7 +120,7 @@ var myColor = d3.scaleThreshold()
       featureElement.attr('d', path)
     }
 
-    // manage layer visibility during map interactions that change projection
+    // manage layer visibility during map interactions
     map.on('viewreset', update)
 
     map.on('movestart', () => {
@@ -127,78 +136,43 @@ var myColor = d3.scaleThreshold()
       svg.classed('hidden', false)
     })
   })
-  
-  /////create a legend////
-  
-var colorScale1 = d3.scaleSequential(d3.schemeGreens[7])
-.domain([100000, 1000000, 10000000, 30000000, 100000000, '500M+'])
+
+/////create a legend/////////////////////////////////////////
 
 
-continuous("#legend1", colorScale1);
+// define layer names
+const layers = [
+  'less than 1M',
+  '1M-10M',
+  '10M-30M',
+  '30M-100M',
+  '100M-500M',
+  '500M+'
+];
+const colors = [
+  '#edf8e9',
+  '#c7e9c0',
+  '#a1d99b',
+  '#74c476',
+  '#31a354',
+  '#006d2c'
+];
 
-// create continuous color legend
-function continuous(selector_id, colorscale) {
-  var legendheight = 800,
-      legendwidth = 80,
-            margin = {top: 500, right: 60, bottom: 10, left: 2};
+// create legend
+const legend = document.getElementById('legend');
 
-  var canvas = d3.select(selector_id)
-    .style("height", legendheight + "px")
-    .style("width", legendwidth + "px")
-    .style("position", "relative")
-    .append("canvas")
-    .attr("height", legendheight - margin.top - margin.bottom)
-    .attr("width", 1)
-    .style("height", (legendheight - margin.top - margin.bottom) + "px")
-    .style("width", (legendwidth - margin.left - margin.right) + "px")
-    .style("border", "1px solid #000")
-    .style("position", "absolute")
-    .style("top", (margin.top) + "px")
-    .style("left", (margin.left) + "px")
-    .node();
+layers.forEach((layer, i) => {
+  const color = colors[i];
+  const item = document.createElement('div');
+  const key = document.createElement('span');
+  key.className = 'legend-key';
+  key.style.backgroundColor = color;
 
-  var ctx = canvas.getContext("2d");
+  const value = document.createElement('span');
+  value.innerHTML = `${layer}`;
+  item.appendChild(key);
+  item.appendChild(value);
+  legend.appendChild(item);
+});
 
-  var legendscale = d3.scaleLinear()
-    .range([1, legendheight - margin.top - margin.bottom])
-    .domain(colorscale.domain());
-
-  // image data hackery based on http://bl.ocks.org/mbostock/048d21cf747371b11884f75ad896e5a5
-  var image = ctx.createImageData(1, legendheight);
-  d3.range(legendheight).forEach(function(i) {
-    var c = d3.rgb(colorscale(legendscale.invert(i)));
-    image.data[4*i] = c.r;
-    image.data[4*i + 1] = c.g;
-    image.data[4*i + 2] = c.b;
-    image.data[4*i + 3] = 255;
-  });
-  ctx.putImageData(image, 0, 0);
-
-  // A simpler way to do the above, but possibly slower. keep in mind the legend width is stretched because the width attr of the canvas is 1
-  // See http://stackoverflow.com/questions/4899799/whats-the-best-way-to-set-a-single-pixel-in-an-html5-canvas
-  /*
-  d3.range(legendheight).forEach(function(i) {
-    ctx.fillStyle = colorscale(legendscale.invert(i));
-    ctx.fillRect(0,i,1,1);
-  });
-  */
-
-  var legendaxis = d3.axisRight()
-    .scale(legendscale)
-    .tickSize(6)
-    .ticks(8);
-
-  var svg = d3.select(selector_id)
-    .append("svg")
-    .attr("height", (legendheight) + "px")
-    .attr("width", (legendwidth) + "px")
-    .style("position", "absolute")
-    .style("left", "0px")
-    .style("top", "0px")
-
-  svg
-    .append("g")
-    .attr("class", "axis")
-    .attr("transform", "translate(" + (legendwidth - margin.left - margin.right + 3) + "," + (margin.top) + ")")
-    .call(legendaxis);
-};
+map.getCanvas().style.cursor = 'default';
